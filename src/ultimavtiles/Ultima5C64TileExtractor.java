@@ -12,9 +12,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class ExtractUltimaVTiles {
+/**
+ * A class to extract the tileset from the Commodore 64/128 version of Ultima V
+ * 
+ * @author Tristan Miller <psychonaut@nothingisreal.com>
+ *
+ */
+public class Ultima5C64TileExtractor {
 
-	final static String ULTIMA_V_DISK = "/home/psy/games/C64/c64/ULTIMA5/PROGRAM.D64";
+	final static String ULTIMA_V_PROGRAM_DISK = "/home/psy/games/C64/c64/ULTIMA5/PROGRAM.D64";
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		int width = 1409;
@@ -30,7 +36,7 @@ public class ExtractUltimaVTiles {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		DataInputStream dataStream = new DataInputStream(
-				new BufferedInputStream(new FileInputStream(new File(ULTIMA_V_DISK))));
+				new BufferedInputStream(new FileInputStream(new File(ULTIMA_V_PROGRAM_DISK))));
 
 		// dataStream.skipBytes(8);
 		int tileRows = height / 16;
