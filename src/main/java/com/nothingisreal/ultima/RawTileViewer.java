@@ -17,6 +17,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import com.google.common.io.Files;
+
 /**
  * Visualizes an entire disk image as bitmapped tiles
  * 
@@ -47,7 +49,7 @@ public class RawTileViewer {
 	private int offset = 0;
 
 	@Argument(required = true, usage = "disk image", metaVar = "FILENAME")
-	private File diskImage;
+	private File diskImageFile;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		new RawTileViewer().doMain(args);
@@ -66,7 +68,13 @@ public class RawTileViewer {
 			System.exit(1);
 		}
 
-		JFrame frame = new JFrame("Direct draw demo");
+		viewImage(diskImageFile);
+	}
+
+	private void viewImage(File diskImageFile) throws IOException {
+		byte[] diskImage = Files.toByteArray(diskImageFile);
+
+		JFrame frame = new JFrame(diskImageFile.getName());
 
 		BufferedImage canvas = new BufferedImage(frameWidth * tileWidth * charWidth,
 				frameHeight * tileHeight * charHeight, BufferedImage.TYPE_INT_ARGB);
@@ -77,24 +85,19 @@ public class RawTileViewer {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		DataInputStream dataStream = new DataInputStream(new BufferedInputStream(new FileInputStream(diskImage)));
-
-		dataStream.skipBytes(offset);
-
+		int i = offset - 1;
 		eof: for (int tileRow = 0; tileRow < frameHeight; tileRow++) {
 			for (int tileCol = 0; tileCol < frameWidth; tileCol++) {
 				for (int charRow = 0; charRow < tileHeight; charRow++) {
 					for (int charCol = 0; charCol < tileWidth; charCol++) {
 						for (int pixelRow = 0; pixelRow < charHeight; pixelRow++) {
-							int theByte = dataStream.read();
-							if (theByte == -1) {
+							if (++i >= diskImage.length)
 								break eof;
-							}
 							for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
 								int x = tileCol * tileWidth * charWidth + charCol * charWidth + charWidth - pixelCol
 										- 1;
 								int y = tileRow * tileHeight * charHeight + charRow * charHeight + pixelRow;
-								if ((theByte & (1 << pixelCol)) != 0) {
+								if ((diskImage[i] & (1 << pixelCol)) != 0) {
 									canvas.setRGB(x, y, Color.WHITE.getRGB());
 								} else
 									canvas.setRGB(x, y, Color.BLACK.getRGB());
@@ -106,7 +109,6 @@ public class RawTileViewer {
 			}
 		}
 
-		dataStream.close();
 	}
 
 }
