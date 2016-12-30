@@ -1,11 +1,10 @@
 package com.nothingisreal.ultima;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.swing.ImageIcon;
@@ -72,11 +71,11 @@ public class RawTileViewer {
 	}
 
 	private void viewImage(File diskImageFile) throws IOException {
-		byte[] diskImage = Files.toByteArray(diskImageFile);
+		final byte[] diskImage = Files.toByteArray(diskImageFile);
 
-		JFrame frame = new JFrame(diskImageFile.getName());
+		final JFrame frame = new JFrame(diskImageFile.getName());
 
-		BufferedImage canvas = new BufferedImage(frameWidth * tileWidth * charWidth,
+		final BufferedImage canvas = new BufferedImage(frameWidth * tileWidth * charWidth,
 				frameHeight * tileHeight * charHeight, BufferedImage.TYPE_INT_ARGB);
 
 		frame.getContentPane().add(new JLabel(new ImageIcon(canvas)));
@@ -85,7 +84,52 @@ public class RawTileViewer {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		drawImage(frame, canvas, diskImage, offset);
+		
+		frame.addKeyListener(new KeyListener() {
+	        public void keyTyped(KeyEvent e) {
+	            System.out.println("Key typed code=" + e.getKeyCode() + ", char=" + e.getKeyChar());
+	        }
+
+	        public void keyPressed(KeyEvent e) {
+	        	switch (e.getKeyCode()) {
+	        	case 37: // Left
+	        		offset -= 1;
+	        		break;
+	        	case 39: // Right
+	        		offset += 1;
+	        		break;
+	        	case 38: // Up
+	        		offset -= charHeight;
+	        		break;
+	        	case 40: // Down
+	        		offset += charHeight;
+	        		break;
+	        	case 33: // PgUp
+	        		offset -= charHeight * tileHeight;
+	        		break;
+	        	case 34: // PgDn
+	        		offset += charHeight * tileHeight;
+	        		break;
+	        	}
+	        	if (offset < 0)
+	        		offset = 0;
+	        	if (offset >= diskImage.length)
+	        		offset = diskImage.length;
+	        	drawImage(frame, canvas, diskImage, offset);
+	        }
+
+	        public void keyReleased(KeyEvent e) {
+	        }
+
+	    });
+	}
+
+	private void drawImage(JFrame frame, BufferedImage canvas, byte[] diskImage, int offset) {
+		if (offset < 0 || offset >= diskImage.length)
+			return;
 		int i = offset - 1;
+		int x = 0, y = 0;
 		eof: for (int tileRow = 0; tileRow < frameHeight; tileRow++) {
 			for (int tileCol = 0; tileCol < frameWidth; tileCol++) {
 				for (int charRow = 0; charRow < tileHeight; charRow++) {
@@ -94,9 +138,9 @@ public class RawTileViewer {
 							if (++i >= diskImage.length)
 								break eof;
 							for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
-								int x = tileCol * tileWidth * charWidth + charCol * charWidth + charWidth - pixelCol
+								x = tileCol * tileWidth * charWidth + charCol * charWidth + charWidth - pixelCol
 										- 1;
-								int y = tileRow * tileHeight * charHeight + charRow * charHeight + pixelRow;
+								y = tileRow * tileHeight * charHeight + charRow * charHeight + pixelRow;
 								if ((diskImage[i] & (1 << pixelCol)) != 0) {
 									canvas.setRGB(x, y, Color.WHITE.getRGB());
 								} else
@@ -105,10 +149,20 @@ public class RawTileViewer {
 						}
 					}
 				}
-				frame.repaint();
 			}
 		}
-
+		// Fill remaining area
+		for (i = y * canvas.getWidth() + x; i < canvas.getWidth() * canvas.getHeight(); i++) {
+			try {
+			canvas.setRGB(i % canvas.getWidth(), i / canvas.getWidth(), Color.BLACK.getRGB());
+			}
+			catch(Exception e) {
+				System.out.println(i);
+				System.out.println(i % canvas.getWidth());
+				System.out.println(i / canvas.getWidth());
+			}
+		}
+		frame.repaint();
 	}
 
 }
