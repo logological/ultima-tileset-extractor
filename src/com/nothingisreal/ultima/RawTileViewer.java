@@ -18,7 +18,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 /**
- * A class to extract the tileset from the Commodore 64/128 version of Ultima V
+ * Visualizes an entire disk image as bitmapped tiles
  * 
  * @author Tristan Miller <psychonaut@nothingisreal.com>
  *
