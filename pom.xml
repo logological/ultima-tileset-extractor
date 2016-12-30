@@ -3,27 +3,14 @@
   <groupId>com.nothingisreal</groupId>
   <artifactId>com.nothingisreal.ultima</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source/>
-          <target/>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <name>Ultima Tileset Extractor</name>
   <url>https://github.com/logological/ultima-tileset-extractor</url>
   <description>This project extracts the tilesets from various Ultima games.</description>
   <dependencies>
-  	<dependency>
-  		<groupId>args4j</groupId>
-  		<artifactId>args4j</artifactId>
-  		<version>2.33</version>
-  	</dependency>
+        <dependency>
+                <groupId>args4j</groupId>
+                <artifactId>args4j</artifactId>
+                <version>2.33</version>
+        </dependency>
   </dependencies>
 </project>
