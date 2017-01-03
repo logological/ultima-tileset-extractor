@@ -20,7 +20,7 @@ import com.google.common.io.Files;
 
 /**
  * Visualizes an entire disk image as bitmapped tiles
- * 
+ *
  * @author Tristan Miller <psychonaut@nothingisreal.com>
  *
  */
@@ -85,7 +85,7 @@ public class RawTileViewer {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		drawImage(frame, canvas, diskImage, offset);
-		
+
 		frame.addKeyListener(new KeyListener() {
 	        public void keyTyped(KeyEvent e) {
 	            System.out.println("Key typed code=" + e.getKeyCode() + ", char=" + e.getKeyChar());
@@ -111,11 +111,19 @@ public class RawTileViewer {
 	        	case 34: // PgDn
 	        		offset += charHeight * tileHeight;
 	        		break;
+	        	case 36: // Home
+	        	    offset = 0;
+	        	    break;
+	        	case 35: // End
+	        	    offset = diskImage.length - canvas.getHeight() * canvas.getWidth();
+	        	    break;
 	        	}
-	        	if (offset < 0)
-	        		offset = 0;
-	        	if (offset >= diskImage.length)
-	        		offset = diskImage.length;
+	        	if (offset < 0) {
+                    offset = 0;
+                }
+	        	if (offset >= diskImage.length) {
+                    offset = diskImage.length;
+                }
 	        	drawImage(frame, canvas, diskImage, offset);
 	        }
 
@@ -126,8 +134,9 @@ public class RawTileViewer {
 	}
 
 	private void drawImage(JFrame frame, BufferedImage canvas, byte[] diskImage, int offset) {
-		if (offset < 0 || offset >= diskImage.length)
-			return;
+		if (offset < 0 || offset >= diskImage.length) {
+            return;
+        }
 		int i = offset - 1;
 		int x = 0, y = 0;
 		eof: for (int tileRow = 0; tileRow < frameHeight; tileRow++) {
@@ -135,16 +144,19 @@ public class RawTileViewer {
 				for (int charRow = 0; charRow < tileHeight; charRow++) {
 					for (int charCol = 0; charCol < tileWidth; charCol++) {
 						for (int pixelRow = 0; pixelRow < charHeight; pixelRow++) {
-							if (++i >= diskImage.length)
-								break eof;
+							if (++i >= diskImage.length) {
+                                break eof;
+                            }
 							for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
 								x = tileCol * tileWidth * charWidth + charCol * charWidth + charWidth - pixelCol
 										- 1;
 								y = tileRow * tileHeight * charHeight + charRow * charHeight + pixelRow;
 								if ((diskImage[i] & (1 << pixelCol)) != 0) {
 									canvas.setRGB(x, y, Color.WHITE.getRGB());
-								} else
-									canvas.setRGB(x, y, Color.BLACK.getRGB());
+								}
+                                else {
+                                    canvas.setRGB(x, y, Color.BLACK.getRGB());
+                                }
 							}
 						}
 					}
