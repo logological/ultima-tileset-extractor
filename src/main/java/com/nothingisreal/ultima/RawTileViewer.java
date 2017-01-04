@@ -106,10 +106,10 @@ public class RawTileViewer {
 	        		offset += charHeight;
 	        		break;
 	        	case 33: // PgUp
-	        		offset -= charHeight * tileHeight;
+	        		offset -= charHeight * tileHeight * tileWidth;
 	        		break;
 	        	case 34: // PgDn
-	        		offset += charHeight * tileHeight;
+	        		offset += charHeight * tileHeight * tileWidth;
 	        		break;
 	        	case 36: // Home
 	        	    offset = 0;
