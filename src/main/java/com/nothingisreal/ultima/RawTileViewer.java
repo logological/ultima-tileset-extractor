@@ -115,7 +115,7 @@ public class RawTileViewer {
 	        	    offset = 0;
 	        	    break;
 	        	case 35: // End
-	        	    offset = diskImage.length - canvas.getHeight() * canvas.getWidth();
+	        	    offset = diskImage.length - canvas.getHeight() * canvas.getWidth() / charWidth;
 	        	    break;
 	        	}
 	        	if (offset < 0) {
