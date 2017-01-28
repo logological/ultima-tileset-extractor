@@ -137,21 +137,21 @@ public class RawTileViewer {
 		if (offset < 0 || offset >= diskImage.length) {
             return;
         }
-		int i = offset - 1;
+		int i = offset;
 		int x = 0, y = 0;
-		eof: for (int tileRow = 0; tileRow < frameHeight; tileRow++) {
+		for (int tileRow = 0; tileRow < frameHeight; tileRow++) {
 			for (int tileCol = 0; tileCol < frameWidth; tileCol++) {
 				for (int charRow = 0; charRow < tileHeight; charRow++) {
 					for (int charCol = 0; charCol < tileWidth; charCol++) {
-						for (int pixelRow = 0; pixelRow < charHeight; pixelRow++) {
-							if (++i >= diskImage.length) {
-                                break eof;
-                            }
+						for (int pixelRow = 0; pixelRow < charHeight; pixelRow++, i++) {
 							for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
 								x = tileCol * tileWidth * charWidth + charCol * charWidth + charWidth - pixelCol
 										- 1;
 								y = tileRow * tileHeight * charHeight + charRow * charHeight + pixelRow;
-								if ((diskImage[i] & (1 << pixelCol)) != 0) {
+								if (i >= diskImage.length) {
+									canvas.setRGB(x, y, Color.GRAY.getRGB());
+	                            }
+								else if ((diskImage[i] & (1 << pixelCol)) != 0) {
 									canvas.setRGB(x, y, Color.WHITE.getRGB());
 								}
                                 else {
@@ -161,17 +161,6 @@ public class RawTileViewer {
 						}
 					}
 				}
-			}
-		}
-		// Fill remaining area
-		for (i = y * canvas.getWidth() + x; i < canvas.getWidth() * canvas.getHeight(); i++) {
-			try {
-			canvas.setRGB(i % canvas.getWidth(), i / canvas.getWidth(), Color.BLACK.getRGB());
-			}
-			catch(Exception e) {
-				System.out.println(i);
-				System.out.println(i % canvas.getWidth());
-				System.out.println(i / canvas.getWidth());
 			}
 		}
 		frame.repaint();
