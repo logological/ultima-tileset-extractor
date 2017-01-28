@@ -88,7 +88,9 @@ public class RawTileViewer {
 
 		frame.addKeyListener(new KeyListener() {
 	        public void keyTyped(KeyEvent e) {
-	            System.out.println("Key typed code=" + e.getKeyCode() + ", char=" + e.getKeyChar());
+	            //System.out.println("Key typed code=" + e.getKeyCode() + ", char=" + e.getKeyChar());
+	        	if (e.getKeyCode() == 0 && e.getKeyChar() == 0x1b)
+	        		System.exit(0);
 	        }
 
 	        public void keyPressed(KeyEvent e) {
@@ -124,6 +126,7 @@ public class RawTileViewer {
 	        	if (offset >= diskImage.length) {
                     offset = diskImage.length;
                 }
+	        	System.out.println("Offset = " + offset);
 	        	drawImage(frame, canvas, diskImage, offset);
 	        }
 
