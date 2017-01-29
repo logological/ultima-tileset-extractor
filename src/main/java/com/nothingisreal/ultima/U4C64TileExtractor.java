@@ -59,9 +59,18 @@ public class U4C64TileExtractor {
 	}
 
 	public static int findOffset(byte[] haystack, byte[] needle) {
-		// FIXME: This doesn't actually work; I think assumes the String is
-		// UTF-8 which has variable byte length
-		return new String(haystack).indexOf(new String(needle));
+		for (int i = 0; i < haystack.length - needle.length + 1; ++i) {
+			boolean found = true;
+			for (int j = 0; j < needle.length; ++j) {
+				if (haystack[i + j] != needle[j]) {
+					found = false;
+					break;
+				}
+			}
+			if (found)
+				return i;
+		}
+		return -1;
 	}
 
 	private void extractFont() throws IOException {
