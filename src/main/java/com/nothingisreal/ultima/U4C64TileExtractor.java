@@ -48,6 +48,7 @@ public class U4C64TileExtractor {
 		diskImage = Files.toByteArray(diskImageFile);
 
 		extractTiles();
+		extractFont();
 	}
 
 	public static int findOffset(byte[] haystack, int[] needle) {
@@ -61,6 +62,36 @@ public class U4C64TileExtractor {
 		// FIXME: This doesn't actually work; I think assumes the String is
 		// UTF-8 which has variable byte length
 		return new String(haystack).indexOf(new String(needle));
+	}
+
+	private void extractFont() throws IOException {
+		int bitmapOffset = 0xf600;
+		int i = bitmapOffset, x = 0, y = 0;
+		BufferedImage tile = new BufferedImage(8, 8, BufferedImage.TYPE_INT_ARGB);
+		final int tileHeight = 1;
+		final int tileWidth = 1;
+		final int charHeight = 8;
+		final int charWidth = 8;
+		for (int tileIndex = 0; tileIndex < 128; tileIndex++) {
+			for (int charRow = 0; charRow < tileHeight; charRow++) {
+				for (int charCol = 0; charCol < tileWidth; charCol++) {
+					for (int pixelRow = 0; pixelRow < charHeight; pixelRow++, i++) {
+						for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
+							x = charCol * charWidth + charWidth - pixelCol - 1;
+							y = charRow * charHeight + pixelRow;
+							if ((diskImage[i + charRow * 4080] & (1 << pixelCol)) != 0) {
+								tile.setRGB(x, y, C64Colour.WHITE.getRGB());
+							} else {
+								tile.setRGB(x, y, C64Colour.BLACK.getRGB());
+							}
+						}
+					}
+				}
+			}
+			String filename = String.format("char%03d.png", tileIndex);
+			File outputFile = new File(outputDir, filename);
+			ImageIO.write(tile, "png", outputFile);
+		}
 	}
 
 	private void extractTiles() throws IOException {
