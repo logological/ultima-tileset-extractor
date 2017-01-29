@@ -61,7 +61,7 @@ public class RawTileViewer {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
 			System.err.println(e.getMessage());
-			System.err.println("java RawTileViewer [options...] FILENAME");
+			System.err.println("Usage: java " + this.getClass().getSimpleName() + " [options...] FILENAME");
 			parser.printUsage(System.err);
 			System.err.println();
 			System.exit(1);
