@@ -47,8 +47,10 @@ public class U4C64TileExtractor {
 
 		diskImage = Files.toByteArray(diskImageFile);
 
+		System.out.println(findOffset(diskImage, new int[] {0x60, 0x60, 0xe0, 0xe0, 0x50, 0x50, 0x50, 0x50}));
 		extractTiles();
 		extractFont();
+		extractIntro();
 	}
 
 	public static int findOffset(byte[] haystack, int[] needle) {
@@ -73,6 +75,35 @@ public class U4C64TileExtractor {
 		return -1;
 	}
 
+	private void extractIntro() throws IOException {
+		int bitmapOffset = 0x18700;
+		int colourOffset = 0x11e00;
+		int i = bitmapOffset, x = 0, y = 0;
+		BufferedImage tile = new BufferedImage(320, 192, BufferedImage.TYPE_INT_ARGB);
+		final int tileHeight = 24;
+		final int tileWidth = 40;
+		final int charHeight = 8;
+		final int charWidth = 8;
+			for (int charRow = 0; charRow < tileHeight; charRow++) {
+				for (int charCol = 0; charCol < tileWidth; charCol++, colourOffset++) {
+					for (int pixelRow = 0; pixelRow < charHeight; pixelRow++, i++) {
+						for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
+							x = charCol * charWidth + charWidth - pixelCol - 1;
+							y = charRow * charHeight + pixelRow;
+							if ((diskImage[i] & (1 << pixelCol)) != 0) {
+								tile.setRGB(x, y, C64Colour.values()[(diskImage[colourOffset] >> 4) & 0x0f].getRGB());
+							} else {
+								tile.setRGB(x, y, C64Colour.values()[diskImage[colourOffset] & 0x0f].getRGB());
+							}
+						}
+					}
+				}
+			String filename = "intro.png";
+			File outputFile = new File(outputDir, filename);
+			ImageIO.write(tile, "png", outputFile);
+		}
+	}
+
 	private void extractFont() throws IOException {
 		int bitmapOffset = 0xf600;
 		int i = bitmapOffset, x = 0, y = 0;
@@ -88,7 +119,7 @@ public class U4C64TileExtractor {
 						for (int pixelCol = 0; pixelCol < charWidth; pixelCol++) {
 							x = charCol * charWidth + charWidth - pixelCol - 1;
 							y = charRow * charHeight + pixelRow;
-							if ((diskImage[i + charRow * 4080] & (1 << pixelCol)) != 0) {
+							if ((diskImage[i] & (1 << pixelCol)) != 0) {
 								tile.setRGB(x, y, C64Colour.WHITE.getRGB());
 							} else {
 								tile.setRGB(x, y, C64Colour.BLACK.getRGB());
