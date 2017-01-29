@@ -47,10 +47,10 @@ public class U4C64TileExtractor {
 
 		diskImage = Files.toByteArray(diskImageFile);
 
-		System.out.println(findOffset(diskImage, new int[] {0x60, 0x60, 0xe0, 0xe0, 0x50, 0x50, 0x50, 0x50}));
 		extractTiles();
 		extractFont();
 		extractIntro();
+		extractMonsters();
 	}
 
 	public static int findOffset(byte[] haystack, int[] needle) {
@@ -102,6 +102,11 @@ public class U4C64TileExtractor {
 			File outputFile = new File(outputDir, filename);
 			ImageIO.write(tile, "png", outputFile);
 		}
+	}
+
+	private void extractMonsters() throws IOException {
+		// TODO
+		int bitmapOffset = 0x1a500;
 	}
 
 	private void extractFont() throws IOException {
